@@ -9,28 +9,28 @@ import {Lesson} from "../model/lesson";
 
 
 @Injectable()
-export class CoursesHttpService {
-
+export class CoursesHttpService { 
+    baseUrl = 'http://localhost:9000';
     constructor(private http:HttpClient) {
 
     }
 
     findAllCourses(): Observable<Course[]> {
-        return this.http.get('/api/courses')
+        return this.http.get(`${this.baseUrl}/api/courses`)
             .pipe(
                 map(res => res['payload'])
             );
     }
 
     findCourseByUrl(courseUrl: string): Observable<Course> {
-      return this.http.get<Course>(`/api/courses/${courseUrl}`);
+      return this.http.get<Course>(this.baseUrl + `/api/courses/${courseUrl}`);
     }
 
     findLessons(
         courseId:number,
         pageNumber = 0, pageSize = 3):  Observable<Lesson[]> {
 
-        return this.http.get<Lesson[]>('/api/lessons', {
+        return this.http.get<Lesson[]>(this.baseUrl + '/api/lessons', {
             params: new HttpParams()
                 .set('courseId', courseId.toString())
                 .set('sortOrder', 'asc')
@@ -41,7 +41,7 @@ export class CoursesHttpService {
 
 
     saveCourse(courseId: number | string, changes: Partial<Course>) {
-        return this.http.put('/api/course/' + courseId, changes);
+        return this.http.put(this.baseUrl + '/api/course/' + courseId, changes);
     }
 
 
