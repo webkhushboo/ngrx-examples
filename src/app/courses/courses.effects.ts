@@ -12,14 +12,25 @@ export class CoursesEffect {
     () => this.action$.pipe(
       ofType(CourseActions.loadAllCourses),
       concatMap(action => this.couresesService.findAllCourses()),
-      map((course: Course[]) => allCoursesLoaded({course}))
+      map((course: Course[]) => allCoursesLoaded({ course }))
     )
+  );
+
+  saveCourses$ = createEffect(
+    () => this.action$.pipe(
+      ofType(CourseActions.courseUpdated),
+      concatMap(action => this.couresesService.saveCourse(
+        action.update.id,
+        action.update.changes
+      ))
+    ),
+    {dispatch: false}
   );
 
   constructor(
     private action$: Actions,
     private couresesService: CoursesHttpService
-  )  {
+  ) {
 
   }
 }

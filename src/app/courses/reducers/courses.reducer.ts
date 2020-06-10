@@ -19,7 +19,12 @@ export const coursesReducer = createReducer(
   initialCourseState,
   on(CourseActions.allCoursesLoaded,
     (state, action) => adapater.addAll(
-      action.course, {...state, allCoursesLoaded: true }))
+      action.course, {...state, allCoursesLoaded: true })),
+
+  on(CourseActions.courseUpdated,
+    (state, action) => adapater.updateOne(
+      action.update, state
+    ))
 );
 
 export const {selectAll} = adapater.getSelectors();
