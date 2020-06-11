@@ -9,7 +9,7 @@ import {CoursesHttpService} from '../services/courses-http.service';
 import { Store, select } from '@ngrx/store';
 import { AppState } from '../../reducers';
 import { selectBegineerCourses, selectAdvancedCourses, selectPromotTotal } from '../courses.selectors';
-
+import { CourseEntityService } from '../services/course-entity.service';
 
 
 @Component({
@@ -28,7 +28,7 @@ export class HomeComponent implements OnInit {
 
     constructor(
       private dialog: MatDialog,
-      private store: Store<AppState>) {
+      private courseService: CourseEntityService) {
 
     }
  
@@ -37,9 +37,15 @@ export class HomeComponent implements OnInit {
     }
 
   reload() {
-   this.beginnerCourses$ = this.store.pipe(select(selectBegineerCourses));
-   this.advancedCourses$ = this.store.pipe(select(selectAdvancedCourses));
-   this.promoTotal$ = this.store.pipe(select(selectPromotTotal));
+   this.beginnerCourses$ = this.courseService.entities$.pipe(
+     map(courses => courses.filter(course => course.category === 'BEGINNER'))
+   );
+   this.advancedCourses$ = this.courseService.entities$.pipe(
+    map(courses => courses.filter(course => course.category === 'ADVANCED'))
+   );
+   this.promoTotal$ = this.courseService.entities$.pipe(
+    map(courses => courses.filter(course => course.promo).length)
+   );
   }
 
   onAddCourse() {

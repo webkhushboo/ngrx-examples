@@ -1,13 +1,14 @@
-import {Component, Inject} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {Course} from '../model/course';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {Observable} from 'rxjs';
-import {CoursesHttpService} from '../services/courses-http.service';
+import { Component, Inject } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { Course } from '../model/course';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Observable } from 'rxjs';
+import { CoursesHttpService } from '../services/courses-http.service';
 import { AppState } from '../../reducers';
 import { Store } from '@ngrx/store';
 import { Update } from '@ngrx/entity';
 import { courseUpdated } from '../course.action';
+import { CourseEntityService } from '../services/course-entity.service';
 
 @Component({
   selector: 'course-dialog',
@@ -24,13 +25,14 @@ export class EditCourseDialogComponent {
 
   mode: 'create' | 'update';
 
-  loading$:Observable<boolean>;
+  loading$: Observable<boolean>;
 
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<EditCourseDialogComponent>,
     @Inject(MAT_DIALOG_DATA) data,
-    private store: Store<AppState>) {
+    private courseService: CourseEntityService
+  ) {
 
     this.dialogTitle = data.dialogTitle;
     this.course = data.course;
@@ -45,7 +47,7 @@ export class EditCourseDialogComponent {
 
     if (this.mode == 'update') {
       this.form = this.fb.group(formControls);
-      this.form.patchValue({...data.course});
+      this.form.patchValue({ ...data.course });
     }
     else if (this.mode == 'create') {
       this.form = this.fb.group({
@@ -67,14 +69,23 @@ export class EditCourseDialogComponent {
       ...this.form.value
     };
 
-    const update: Update<Course> = {
-      id: course.id,
-      changes: course
-    };
+    // const update: Update<Course> = {
+    //   id: course.id,
+    //   changes: course
+    // };
 
-    this.store.dispatch(courseUpdated({update}));
-    this.dialogRef.close();
+    // this.store.dispatch(courseUpdated({update}));
+    if (this.mode === 'update') {
+      this.courseService.update(course);
+      this.dialogRef.close();
+    } else if (this.mode === 'create') {
+      this.courseService.add(course)
+        .subscribe(
+          newCourse => {
+            console.log('New course', newCourse);
+            this.dialogRef.close();
+          }
+        );
+    }
   }
-
-
 }

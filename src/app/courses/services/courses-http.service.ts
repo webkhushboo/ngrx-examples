@@ -11,7 +11,7 @@ import {Lesson} from "../model/lesson";
 @Injectable()
 export class CoursesHttpService { 
     baseUrl = 'http://localhost:9000';
-    constructor(private http:HttpClient) {
+    constructor(private http: HttpClient) {
 
     }
 
